@@ -11,3 +11,82 @@ let jobs = [
 ];
 
 let currentTab = 'all';
+
+function init() {
+    renderJobs();
+    updateDashboard();
+}
+
+function renderJobs() {
+    const container = document.getElementById('jobs-container');
+    const emptyState = document.getElementById('empty-state');
+
+    const filteredJobs = currentTab === 'all' ? jobs : jobs.filter(j => j.status === currentTab);
+    
+    document.getElementById('tab-job-count').innerText = `${filteredJobs.length} Jobs`;
+    container.innerHTML = "";
+
+   if (filteredJobs.length === 0) {
+        container.classList.add('hidden');
+        emptyState.classList.remove('hidden');
+    } else {
+        container.classList.remove('hidden');
+        emptyState.classList.add('hidden');
+
+
+           filteredJobs.forEach(job => {
+            container.innerHTML += `
+                <div class="card bg-white shadow-xl border border-gray-100 p-6 hover:scale-[1.02] transition-transform">
+                    <div class="flex justify-between items-start">
+                        <div>
+                            <h3 class="font-bold text-lg">${job.company}</h3>
+                            <p class="text-blue-600 font-medium">${job.pos}</p>
+                        </div>
+                        <button onclick="deleteJob(${job.id})" class="btn btn-ghost btn-sm text-red-400">✕</button>
+                    </div>
+                    <div class="my-4 text-sm text-gray-500 space-y-1">
+                        <p>📍 ${job.loc} | 💼 ${job.type}</p>
+                        <p>💰 Salary: ${job.salary}</p>
+                        <p class="italic">"${job.desc}"</p>
+                    </div>
+                    <div class="card-actions flex gap-2">
+                        <button onclick="updateStatus(${job.id}, 'interview')" class="btn btn-sm flex-1 ${job.status === 'interview' ? 'btn-warning' : 'btn-outline'}">Interview</button>
+                        <button onclick="updateStatus(${job.id}, 'rejected')" class="btn btn-sm flex-1 ${job.status === 'rejected' ? 'btn-error' : 'btn-outline'}">Rejected</button>
+                    </div>
+                </div>
+            `;
+        });
+    }
+}
+
+function updateStatus(id, newStatus) {
+    jobs = jobs.map(job => {
+        if (job.id === id) {
+            return { ...job, status: job.status === newStatus ? 'all' : newStatus };
+        }
+        return job;
+    });
+    renderJobs();
+    updateDashboard();
+}
+
+function deleteJob(id) {
+    jobs = jobs.filter(job => job.id !== id);
+    renderJobs();
+    updateDashboard();
+}
+
+function switchTab(tab, el) {
+    currentTab = tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('tab-active'));
+    el.classList.add('tab-active');
+    renderJobs();
+}
+
+function updateDashboard() {
+    document.getElementById('total-jobs-count').innerText = jobs.length;
+    document.getElementById('interview-count').innerText = jobs.filter(j => j.status === 'interview').length;
+    document.getElementById('rejected-count').innerText = jobs.filter(j => j.status === 'rejected').length;
+}
+
+init();
