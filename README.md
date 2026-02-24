@@ -35,6 +35,13 @@ document.getElementById("list").addEventListener("click", function(event) {
 });
 ### 5. What is the difference between preventDefault() and stopPropagation() methods?
 
+preventDefault stops the default action of an HTML element from happening.
+
+document.getElementById("link").addEventListener("click", function(event) {
+    event.preventDefault();
+    alert("Link click prevented!");
+});
+
 ---
 
 
